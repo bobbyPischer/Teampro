@@ -5,19 +5,20 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  TextInput,
+  Button,
 } from 'react-native';
 import React from 'react';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import {useNavigation} from '@react-navigation/native';
-import {useForm, Controller} from 'react-hook-form';
+import {Formik, validateYupSchema, yupToFormErrors} from 'formik';
+import {logInSchema, signUpSchema} from '../../utils/validationSchemas';
 import arrowIcon from '../../../assets/arrowIcon.png';
 import axios from 'axios';
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
-
-  const {control, handleSubmit} = useForm();
 
   const onRegisterPressed = async values => {
     try {
@@ -41,26 +42,77 @@ const SignUpScreen = () => {
         <Image style={styles.icon} source={arrowIcon}></Image>
       </TouchableOpacity>
       <Text style={styles.header}>TeamPro</Text>
-      <Text style={styles.inputHeader}>Name</Text>
 
-      <CustomInput name="name" placeholder="Name" control={control} />
-      <Text style={styles.inputHeader}>Email</Text>
-      <CustomInput name="email" placeholder="Email" control={control} />
-      <Text style={styles.inputHeader}>Password</Text>
-      <CustomInput
-        name="password"
-        placeholder="Password"
-        control={control}
-        secureTextEntry={true}
-      />
-      <Text style={styles.inputHeader}>Confirm Password</Text>
-      <CustomInput
-        name="confirmPassword"
-        placeholder="Confirm Password"
-        control={control}
-        secureTextEntry={true}
-      />
-      <CustomButton text="Signin" onPress={handleSubmit(onRegisterPressed)} />
+      <Formik
+        validationSchema={signUpSchema}
+        initialValues={{name: '', email: '', password: '', confirmPassword: ''}}
+        onSubmit={values => {
+          onRegisterPressed(values);
+        }}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          isValid,
+        }) => (
+          <View>
+            <Text style={styles.inputHeader}>Name</Text>
+            <TextInput
+              style={styles.container}
+              placeholder="name"
+              onChangeText={handleChange('name')}
+              value={values.name}
+            />
+            {errors.name && (
+              <Text style={{fontSize: 10, color: 'red'}}>{errors.name}</Text>
+            )}
+            <Text style={styles.inputHeader}>Email</Text>
+            <TextInput
+              style={styles.container}
+              placeholder="email"
+              onChangeText={handleChange('email')}
+              value={values.email}
+            />
+            {errors.email && (
+              <Text style={{fontSize: 10, color: 'red'}}>{errors.email}</Text>
+            )}
+            <Text style={styles.inputHeader}>Password</Text>
+            <TextInput
+              style={styles.container}
+              placeholder="password"
+              onChangeText={handleChange('password')}
+              value={values.password}
+              secureTextEntry
+            />
+            {errors.password && (
+              <Text style={{fontSize: 10, color: 'red'}}>
+                {errors.password}
+              </Text>
+            )}
+            <Text style={styles.inputHeader}>Confirm</Text>
+            <TextInput
+              style={styles.container}
+              placeholder="confirmPassword"
+              onChangeText={handleChange('confirmPassword')}
+              value={values.confirmPassword}
+              secureTextEntry
+            />
+            {errors.confirmPassword && (
+              <Text style={{fontSize: 10, color: 'red'}}>
+                {errors.confirmPassword}
+              </Text>
+            )}
+
+            <Button
+              style={styles.container}
+              title="submit"
+              onPress={handleSubmit}
+            />
+          </View>
+        )}
+      </Formik>
     </SafeAreaView>
   );
 };
@@ -90,6 +142,7 @@ const styles = StyleSheet.create({
     paddingRight: 300,
     alignItems: 'flex-end',
     flexWrap: 'nowrap',
+    marginLeft: 3,
   },
   icon: {
     position: 'relative',
@@ -97,6 +150,27 @@ const styles = StyleSheet.create({
     marginRight: 300,
     marginBottom: 20,
   },
+  container: {
+    backgroundColor: 'white',
+    width: 370,
+
+    borderRadius: 10,
+
+    padding: 15,
+
+    marginVertical: 15,
+
+    textAlign: 'auto',
+  },
+  buttonContainer: {
+    backgroundColor: '#FFFDE0',
+    width: '95%',
+    borderRadius: 10,
+    padding: 15,
+    marginVertical: 5,
+    alignItems: 'center',
+  },
+  text: {color: '#002E27', fontWeight: 'bold'},
 });
 
 export default SignUpScreen;

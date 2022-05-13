@@ -1,6 +1,6 @@
 import {View, Text, TextInput, StyleSheet} from 'react-native';
 import React from 'react';
-import {Controller} from 'react-hook-form';
+import {Formik} from 'formik';
 
 const CustomInput = ({control, name, placeholder, secureTextEntry}) => {
   return (
