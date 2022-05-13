@@ -1,5 +1,4 @@
 import {
-  View,
   Text,
   StyleSheet,
   TouchableOpacity,
@@ -11,15 +10,35 @@ import CustomInput from '../../components/CustomInput/CustomInput';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {useForm} from 'react-hook-form';
 import arrowIcon from '../../../assets/arrowIcon.png';
+import axios from 'axios';
 
 const SignInScreen = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const navigation = useNavigation();
+  const [token, setToken] = useState(false);
+  const [user, setUser] = useState();
+  const [values, setValues] = useState();
 
-  const onSignInPressed = () => {
-    navigation.navigate('LandingPage');
+  const {control, handleSubmit} = useForm();
+
+  const onSignInPressed = async values => {
+    try {
+      const {data} = await axios.post(
+        'http://localhost:3000/auth/login',
+        values,
+      );
+      const {user, token} = data;
+      console.log(data);
+
+      setUser(user);
+      setToken(token);
+      console.warn(token);
+      navigation.navigate('Messages');
+    } catch (error) {
+      console.warn('error logging in');
+      setValues('');
+    }
   };
 
   return (
@@ -31,23 +50,23 @@ const SignInScreen = () => {
         }}>
         <Image style={styles.icon} source={arrowIcon}></Image>
       </TouchableOpacity>
-
       <Text style={styles.header}>TeamPro</Text>
       <Text style={styles.inputHeader1}>Email</Text>
+
       <CustomInput
-        placeholder="Username"
-        value={username}
-        setValue={setUsername}
+        name="email"
+        placeholder="Email"
+        control={control}
         secureTextEntry={false}
       />
       <Text style={styles.inputHeader2}>Password</Text>
       <CustomInput
+        name="password"
         placeholder="Password"
-        value={password}
-        setValue={setPassword}
+        control={control}
         secureTextEntry={true}
       />
-      <CustomButton text="Signin" onPress={onSignInPressed} />
+      <CustomButton text="Signin" onPress={handleSubmit(onSignInPressed)} />
     </SafeAreaView>
   );
 };

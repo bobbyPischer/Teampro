@@ -3,28 +3,32 @@ import {
   Image,
   Text,
   StyleSheet,
-  TextInput,
   SafeAreaView,
   TouchableOpacity,
-  ImageBackground,
 } from 'react-native';
 import React from 'react';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import CustomButton from '../../components/CustomButton/CustomButton';
-import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {useForm, Controller} from 'react-hook-form';
 import arrowIcon from '../../../assets/arrowIcon.png';
+import axios from 'axios';
 
 const SignUpScreen = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
   const navigation = useNavigation();
 
-  const onRegisterPressed = () => {
-    navigation.navigate('LandingPage');
+  const {control, handleSubmit} = useForm();
+
+  const onRegisterPressed = async values => {
+    try {
+      const {data} = await axios.post(
+        'http://localhost:3000/auth/register',
+        values,
+      );
+      console.log(data);
+    } catch (error) {
+      console.log('error registering user', error);
+    }
   };
 
   return (
@@ -36,31 +40,27 @@ const SignUpScreen = () => {
         }}>
         <Image style={styles.icon} source={arrowIcon}></Image>
       </TouchableOpacity>
-
       <Text style={styles.header}>TeamPro</Text>
-
       <Text style={styles.inputHeader}>Name</Text>
-      <CustomInput placeholder="Name" value={name} setValue={setName} />
 
+      <CustomInput name="name" placeholder="Name" control={control} />
       <Text style={styles.inputHeader}>Email</Text>
-      <CustomInput placeholder="Email " value={email} setValue={setEmail} />
-
+      <CustomInput name="email" placeholder="Email" control={control} />
       <Text style={styles.inputHeader}>Password</Text>
       <CustomInput
+        name="password"
         placeholder="Password"
-        value={password}
-        setValue={setPassword}
+        control={control}
         secureTextEntry={true}
       />
       <Text style={styles.inputHeader}>Confirm Password</Text>
       <CustomInput
+        name="confirmPassword"
         placeholder="Confirm Password"
-        value={confirmPassword}
-        setValue={setConfirmPassword}
+        control={control}
         secureTextEntry={true}
       />
-
-      <CustomButton text="Signin" onPress={onRegisterPressed} />
+      <CustomButton text="Signin" onPress={handleSubmit(onRegisterPressed)} />
     </SafeAreaView>
   );
 };
@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     position: 'relative',
+
     marginRight: 300,
     marginBottom: 20,
   },

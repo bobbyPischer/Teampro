@@ -1,7 +1,6 @@
-import React from 'react';
 import {Text, View, StyleSheet, SafeAreaView} from 'react-native';
-import SignInScreen from './src/screens/signInScreen/SignInScreen';
-import SignUpScreen from './src/screens/signUpScreen/SignUpScreen';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
+
 import Navigation from './src/navigation';
 
 const YourApp = () => {
